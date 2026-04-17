@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>Rise City Life</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+font-family:Arial,Helvetica,sans-serif;
+overflow:hidden;
+background:#111827;
+color:#fff;
+}
+
+/* loader */
+#loader{
+position:fixed;
+inset:0;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+background:linear-gradient(135deg,#050816,#10243f,#09111d);
+z-index:9999;
+}
+
+#loader h1{
+font-size:42px;
+color:#00eaff;
+margin-bottom:16px;
+text-shadow:0 0 20px #00eaff;
+}
+
+#loader p{
+margin-bottom:16px;
+font-size:18px;
+}
+
+#box{
+width:80%;
+max-width:420px;
+height:18px;
+background:#1e293b;
+border-radius:20px;
+overflow:hidden;
+}
+
+#fill{
+width:0%;
+height:100%;
+background:linear-gradient(90deg,#00eaff,#00ff88,#ffd000);
+}
+
+#txt{margin-top:12px}
+
+/* game */
+#game{
+display:none;
+width:100%;
+height:100vh;
+position:relative;
+overflow:hidden;
+background:#9ad8ff;
+}
+
+/* top ui */
+#top{
+position:absolute;
+top:10px;
+left:10px;
+right:10px;
+display:flex;
+justify-content:space-between;
+gap:10px;
+z-index:50;
+}
+
+.panel{
+background:rgba(0,0,0,.45);
+padding:10px 14px;
+border-radius:14px;
+font-size:14px;
+line-height:1.6;
+backdrop-filter:blur(6px);
+}
+
+/* welcome */
+#welcome{
+position:absolute;
+top:75px;
+left:50%;
+transform:translateX(-50%);
+background:rgba(0,0,0,.45);
+padding:12px 20px;
+border-radius:14px;
+z-index:60;
+}
+
+/* world */
+#world{
+position:absolute;
+inset:0;
+overflow:hidden;
+}
+
+/* sky */
+.cloud{
+position:absolute;
+top:60px;
+width:110px;
+height:42px;
+background:#fff;
+border-radius:40px;
+opacity:.9;
+}
+
+/* buildings */
+.build{
+position:absolute;
+bottom:34%;
+width:130px;
+background:#dcecff;
+border:4px solid #c1d7f2;
+border-bottom:none;
+border-radius:6px 6px 0 0;
+}
+
+.window{
+position:absolute;
+width:16px;
+height:22px;
+background:#4f87c9;
+}
+
+/* road */
+#road{
+position:absolute;
+left:0;
+bottom:0;
+width:100%;
+height:34%;
+background:#5b5b5b;
+border-top:8px solid #bbb;
+}
+
+#line{
+position:absolute;
+top:48%;
+width:100%;
+height:8px;
+background:repeating-linear-gradient(
+to right,
+#fff 0,#fff 40px,
+transparent 40px,transparent 80px
+);
+animation:road .7s linear infinite;
+}
+
+@keyframes road{
+to{transform:translateX(-80px)}
+}
+
+/* player */
+#player{
+position:absolute;
+left:90px;
+bottom:118px;
+width:72px;
+height:112px;
+z-index:20;
+transition:.2s;
+}
+
+.head{
+width:42px;
+height:42px;
+background:#f5c49f;
+margin:auto;
+border-radius:6px;
+}
+
+.body{
+width:72px;
+height:44px;
+background:#ffd000;
+border-radius:8px;
+margin-top:2px;
+}
+
+.legs{
+display:flex;
+justify-content:space-between;
+}
+
+.leg{
+width:28px;
+height:34px;
+background:#111;
+margin-top:2px;
+border-radius:4px;
+}
+
+.sword{
+position:absolute;
+right:-55px;
+top:52px;
+width:75px;
+height:10px;
+border-radius:10px;
+background:linear-gradient(90deg,#00eaff,#fff);
+box-shadow:0 0 15px #00eaff;
+transform:rotate(-18deg);
+}
+
+/* enemies */
+.enemy{
+position:absolute;
+bottom:118px;
+width:72px;
+height:112px;
+z-index:15;
+}
+
+.enemy .body{background:#7c3aed}
+.enemy .sword{right:-45px;width:65px}
+
+/* house interior */
+#house{
+display:none;
+position:absolute;
+inset:0;
+background:linear-gradient(#f2f2f2,#ddd);
+z-index:100;
+}
+
+.wall{
+position:absolute;
+inset:0;
+background:
+linear-gradient(90deg,#111 0 12%,transparent 12% 30%,#111 30% 42%,transparent 42% 58%,#111 58% 70%,transparent 70% 88%,#111 88% 100%);
+opacity:.7;
+}
+
+.windowBig{
+position:absolute;
+top:40px;
+left:14%;
+width:72%;
+height:220px;
+background:#bcecff;
+border:6px solid #fff;
+}
+
+.sofa{
+position:absolute;
+bottom:160px;
+width:180px;
+height:80px;
+background:#9be37f;
+border-radius:12px;
+}
+
+#s1{left:80px}
+#s2{right:80px}
+
+.table{
+position:absolute;
+bottom:95px;
+left:50%;
+transform:translateX(-50%);
+width:260px;
+height:70px;
+background:#9b5f28;
+border-radius:8px;
+}
+
+#insidePlayer{
+position:absolute;
+right:140px;
+bottom:165px;
+width:72px;
+height:112px;
+}
+
+/* controls */
+#joy{
+position:absolute;
+left:18px;
+bottom:24px;
+width:96px;
+height:96px;
+border-radius:50%;
+background:rgba(0,0,0,.35);
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:34px;
+z-index:200;
+}
+
+#actions{
+position:absolute;
+right:18px;
+bottom:24px;
+display:grid;
+grid-template-columns:repeat(2,78px);
+gap:12px;
+z-index:200;
+}
+
+.btn{
+width:78px;
+height:78px;
+border-radius:50%;
+border:none;
+background:rgba(0,0,0,.45);
+color:#fff;
+font-size:12px;
+font-weight:bold;
+}
+
+/* inventory */
+#inv{
+position:absolute;
+left:50%;
+transform:translateX(-50%);
+bottom:10px;
+display:flex;
+gap:8px;
+z-index:210;
+}
+
+.slot{
+width:56px;
+height:56px;
+background:rgba(255,255,255,.2);
+border:2px solid rgba(255,255,255,.4);
+border-radius:10px;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:22px;
+}
+</style>
+</head>
+<body>
+
+<div id="loader">
+<h1>RISE CITY LIFE</h1>
+<p>Loading Ultra World Assets (400MB)</p>
+<div id="box"><div id="fill"></div></div>
+<div id="txt">0%</div>
+</div>
+
+<div id="game">
+
+<div id="top">
+<div class="panel">
+Level: <span id="lvl">1</span>/250<br>
+XP: <span id="xp">0</span>/<span id="need">100</span><br>
+Coins: <span id="coins">500</span>
+</div>
+
+<div class="panel">
+Cash: $<span id="cash">0.00</span><br>
+Gems: <span id="gems">10</span><br>
+HP: <span id="hp">100</span>
+</div>
+</div>
+
+<div id="welcome">Welcome to Rise City. Fight, build, earn rewards.</div>
+
+<div id="world">
+
+<div class="cloud" style="left:10%"></div>
+<div class="cloud" style="left:50%"></div>
+<div class="cloud" style="left:76%"></div>
+
+<div class="build" style="left:0;height:240px"></div>
+<div class="build" style="left:150px;height:210px"></div>
+<div class="build" style="left:320px;height:290px"></div>
+<div class="build" style="right:220px;height:250px"></div>
+<div class="build" style="right:50px;height:230px"></div>
+
+<div id="road"><div id="line"></div></div>
+
+<div id="player">
+<div class="sword"></div>
+<div class="head"></div>
+<div class="body"></div>
+<div class="legs">
+<div class="leg"></div>
+<div class="leg"></div>
+</div>
+</div>
+
+<div class="enemy" id="e1" style="left:430px">
+<div class="sword"></div>
+<div class="head"></div>
+<div class="body"></div>
+<div class="legs"><div class="leg"></div><div class="leg"></div></div>
+</div>
+
+<div class="enemy" id="e2" style="left:640px">
+<div class="sword"></div>
+<div class="head"></div>
+<div class="body"></div>
+<div class="legs"><div class="leg"></div><div class="leg"></div></div>
+</div>
+
+</div>
+
+<!-- house -->
+<div id="house">
+<div class="wall"></div>
+<div class="windowBig"></div>
+<div class="sofa" id="s1"></div>
+<div class="sofa" id="s2"></div>
+<div class="table"></div>
+
+<div id="insidePlayer">
+<div class="head"></div>
+<div class="body" style="background:#ff4d4d"></div>
+<div class="legs">
+<div class="leg"></div>
+<div class="leg"></div>
+</div>
+</div>
+</div>
+
+<div id="joy">◉</div>
+
+<div id="actions">
+<button class="btn" onclick="attack()">ATTACK</button>
+<button class="btn" onclick="jump()">JUMP</button>
+<button class="btn" onclick="toggleHouse()">HOUSE</button>
+<button class="btn" onclick="refer()">REFER</button>
+</div>
+
+<div id="inv">
+<div class="slot">⚔️</div>
+<div class="slot">🌱</div>
+<div class="slot">💎</div>
+<div class="slot">🏠</div>
+<div class="slot">🎁</div>
+</div>
+
+</div>
+
+<script>
+/* loading */
+let p=0;
+let ld=setInterval(()=>{
+p++;
+fill.style.width=p+"%";
+txt.innerHTML=p+"%";
+if(p>=100){
+clearInterval(ld);
+loader.style.display="none";
+game.style.display="block";
+makeWindows();
+}
+},28);
+
+/* windows */
+function makeWindows(){
+document.querySelectorAll(".build").forEach(b=>{
+for(let y=18;y<200;y+=34){
+for(let x=14;x<90;x+=28){
+let w=document.createElement("div");
+w.className="window";
+w.style.left=x+"px";
+w.style.top=y+"px";
+b.appendChild(w);
+}
+}
+});
+}
+
+/* stats */
+let level=1,xpVal=0,needVal=100,coinsVal=500,cashVal=0,gemsVal=10,hpVal=100;
+let pos=90;
+let inHouse=false;
+
+function updateUI(){
+lvl.textContent=level;
+xp.textContent=xpVal;
+need.textContent=needVal;
+coins.textContent=coinsVal;
+cash.textContent=cashVal.toFixed(2);
+gems.textContent=gemsVal;
+hp.textContent=hpVal;
+}
+
+function nextNeed(lv){
+if(lv<=50)return 100+lv*10;
+if(lv<=100)return 700+lv*22;
+if(lv<=180)return 2200+lv*40;
+if(lv<=240)return 6500+lv*70;
+return 15000+lv*140;
+}
+
+function addXP(v){
+xpVal+=v;
+
+while(xpVal>=needVal && level<250){
+xpVal-=needVal;
+level++;
+needVal=nextNeed(level);
+coinsVal+=100*level;
+gemsVal+=2;
+
+if(level==20){
+cashVal+=20;
+say("Level 20 reward: $20");
+}
+
+if(level==250){
+cashVal+=50000;
+say("Legend Rank! $50,000 unlocked");
+}
+}
+updateUI();
+}
+
+function say(t){
+welcome.innerHTML=t;
+setTimeout(()=>{
+welcome.innerHTML="Welcome to Rise City. Fight, build, earn rewards.";
+},2400);
+}
+
+/* actions */
+function attack(){
+if(inHouse){
+say("No fighting inside house.");
+return;
+}
+
+let gain=Math.floor(Math.random()*45)+25;
+let damage=Math.floor(Math.random()*12);
+
+hpVal-=damage;
+if(hpVal<0)hpVal=0;
+
+coinsVal+=50;
+addXP(gain);
+
+e1.style.left=(380+Math.random()*150)+"px";
+e2.style.left=(560+Math.random()*180)+"px";
+
+if(hpVal===0){
+hpVal=100;
+say("Defeated. Respawned.");
+}else{
+say("Enemy defeated +"+gain+" XP");
+}
+updateUI();
+}
+
+function jump(){
+if(inHouse){
+insidePlayer.style.bottom="220px";
+setTimeout(()=>insidePlayer.style.bottom="165px",300);
+}else{
+player.style.bottom="180px";
+setTimeout(()=>player.style.bottom="118px",300);
+}
+say("Jump!");
+}
+
+function toggleHouse(){
+inHouse=!inHouse;
+house.style.display=inHouse?"block":"none";
+world.style.display=inHouse?"none":"block";
+say(inHouse?"Entered your house":"Returned to city");
+}
+
+function refer(){
+let earn=(10+Math.random()*50)*0.10;
+cashVal+=earn;
+say("Referral joined +$"+earn.toFixed(2));
+updateUI();
+}
+
+/* move */
+joy.onclick=()=>{
+if(inHouse){
+let x=parseInt(insidePlayer.style.right||140);
+x-=20;
+if(x<40)x=220;
+insidePlayer.style.right=x+"px";
+}else{
+pos+=25;
+if(pos>320)pos=90;
+player.style.left=pos+"px";
+}
+};
+
+/* sky cycle */
+let t=0;
+setInterval(()=>{
+t++;
+let c=180+Math.sin(t/20)*35;
+game.style.background="linear-gradient(rgb(60,"+c+",255),#dff8ff)";
+},120);
+
+updateUI();
+</script>
+
+</body>
+</html>
